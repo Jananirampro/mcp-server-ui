@@ -1,0 +1,18 @@
+.env
+__pycache__/
+
+chat_logs.txt
+bot_logs.txt
+.venv/
+venv/
+env/
+.venv/
+venv-311/
+
+# 🧠 VSCode & PyCharm
+.vscode/
+.idea/
+
+# 🚫 OS Files
+.DS_Store
+Thumbs.db
