@@ -2,41 +2,46 @@ const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-const MCP_SERVER_URL = "https://mcp-server-97hm.onrender.com"; // Replace with your deployed MCP server
+const MCP_SERVER_URL = "https://mcp-server-ui.onrender.com/api/v1/chat"; // Replace with your deployed MCP server
 
-function appendMessage(text, sender) {
-  const msg = document.createElement("div");
-  msg.classList.add("message", sender);
-  msg.innerText = text;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+
+document.getElementById("send-btn").addEventListener("click", sendMessage);
+document.getElementById("user-input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
 
 async function sendMessage() {
-  const message = userInput.value.trim();
-  if (!message) return;
+    const input = document.getElementById("user-input");
+    const message = input.value.trim();
+    if (!message) return;
 
-  appendMessage(message, "user");
-  userInput.value = "";
+    addMessage(message, "user");
+    input.value = "";
 
-  try {
-    const res = await fetch(MCP_SERVER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ model: "mistralai/mistral-7b-instruct:free", message })
-    });
+    try {
+        const response = await fetch(MCP_SERVER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ model: "mistralai/mistral-7b-instruct:free", message }),
+        });
 
-    const data = await res.json();
-    appendMessage(data.response || ⚠️ No response", "bot");
-  } catch (error) {
-    appendMessage("❌ MCP Server error!", "bot");
-    console.error(error);
-  }
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        addMessage(data.response || "No response from MCP.", "bot");
+    } catch (error) {
+        console.error(error);
+        addMessage("⚠️ MCP Server not reachable.", "bot");
+    }
 }
 
-sendBtn.addEventListener("click", sendMessage);
-userInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") sendMessage();
-});
+function addMessage(text, sender) {
+    const chatBox = document.getElementById("chat-box");
+    const div = document.createElement("div");
+    div.className = `message ${sender}`;
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
