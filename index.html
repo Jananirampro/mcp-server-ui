@@ -1,134 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCP Chat UI</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .chat-container {
-      width: 400px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .chat-header {
-      background: #4CAF50;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .message {
-      padding: 10px;
-      border-radius: 8px;
-      max-width: 80%;
-    }
-    .user-message {
-      background: #DCF8C6;
-      align-self: flex-end;
-    }
-    .bot-message {
-      background: #ECECEC;
-      align-self: flex-start;
-    }
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #ddd;
-    }
-    .chat-input input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      outline: none;
-    }
-    .chat-input button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .chat-input button:hover {
-      background: #45a049;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Agent UI</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">MCP AI Assistant</div>
-    <div class="chat-box" id="chatBox"></div>
-    <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+        <header>MCP Chat Assistant</header>
+        <div id="chat-box" class="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message..." />
+            <button id="send-btn">Send</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const MCP_SERVER_URL = "https://mcp-server-97hm.onrender.com/chat"; // ✅ Replace with your deployed MCP endpoint
-
-    const chatBox = document.getElementById("chatBox");
-    const userInput = document.getElementById("userInput");
-
-    function appendMessage(text, className) {
-      const msg = document.createElement("div");
-      msg.classList.add("message", className);
-      msg.textContent = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    async function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) return;
-      appendMessage(text, "user-message");
-      userInput.value = "";
-
-      try {
-        const response = await fetch(MCP_SERVER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, model: "mistralai/mistral-7b-instruct:free" })
-        });
-
-        if (!response.ok) {
-          appendMessage("Error: " + response.statusText, "bot-message");
-          return;
-        }
-
-        const data = await response.json();
-        const reply = data.response || data.message || "No response from MCP.";
-        appendMessage(reply, "bot-message");
-      } catch (error) {
-        appendMessage("🚨 Error connecting to MCP server.", "bot-message");
-        console.error(error);
-      }
-    }
-
-    userInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-  </script>
+    <script src="app.js"></script>
 </body>
 </html>
