@@ -1,130 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCP Agent UI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP AI Assistant</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ece9e6, #ffffff);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
+
     .chat-container {
-      width: 400px;
+      width: 450px;
       background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      animation: fadeIn 0.5s ease-in-out;
     }
+
     .chat-header {
-      background: #0078d7;
-      color: white;
-      padding: 15px;
-      font-size: 18px;
+      background: #4CAF50;
+      color: #fff;
+      padding: 18px;
       text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
-    .chat-messages {
+
+    .chat-box {
       flex: 1;
       padding: 15px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      background: #f8f8f8;
     }
+
     .message {
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px 14px;
+      border-radius: 14px;
       max-width: 80%;
+      word-wrap: break-word;
+      line-height: 1.4;
+      animation: slideIn 0.3s ease-in-out;
     }
-    .user {
+
+    .user-message {
+      background: #DCF8C6;
       align-self: flex-end;
-      background: #0078d7;
-      color: white;
     }
-    .bot {
+
+    .bot-message {
+      background: #ECECEC;
       align-self: flex-start;
-      background: #f1f1f1;
     }
+
+    .loading {
+      font-style: italic;
+      color: #888;
+    }
+
     .chat-input {
       display: flex;
       border-top: 1px solid #ddd;
+      background: #fff;
     }
+
     .chat-input input {
       flex: 1;
-      padding: 10px;
+      padding: 14px;
       border: none;
       outline: none;
       font-size: 16px;
     }
+
     .chat-input button {
-      background: #0078d7;
+      background: #4CAF50;
       color: white;
       border: none;
-      padding: 10px 15px;
-      cursor: pointer;
+      padding: 14px 20px;
       font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
     }
+
     .chat-input button:hover {
-      background: #005fa3;
+      background: #45a049;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">MCP Agent Chat</div>
-    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-header">MCP AI Assistant</div>
+    <div class="chat-box" id="chatBox"></div>
     <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Type a message..." />
+      <input type="text" id="userInput" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
   <script>
-    const API_BASE = "https://mcp-server-ui.onrender.com"/api/v1/chat"; // ✅ Replace with your Render MCP URL
-    const MODEL = "mistralai/mistral-7b-instruct:free"; // ✅ or another model from OpenRouter
+    const MCP_SERVER_URL = "https://mcp-server-ui.onrender.com/chat"; // ✅ Replace with your MCP endpoint
+
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+
+    function appendMessage(text, className) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", className);
+      msg.textContent = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendLoading() {
+      const loadingMsg = document.createElement("div");
+      loadingMsg.classList.add("message", "bot-message", "loading");
+      loadingMsg.id = "loading";
+      loadingMsg.textContent = "Thinking...";
+      chatBox.appendChild(loadingMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function removeLoading() {
+      const loadingMsg = document.getElementById("loading");
+      if (loadingMsg) chatBox.removeChild(loadingMsg);
+    }
 
     async function sendMessage() {
-      const input = document.getElementById("user-input");
-      const message = input.value.trim();
-      if (!message) return;
+      const text = userInput.value.trim();
+      if (!text) return;
+      appendMessage(text, "user-message");
+      userInput.value = "";
 
-      addMessage(message, "user");
-      input.value = "";
+      appendLoading();
 
       try {
-        const response = await fetch(API_BASE, {
+        const response = await fetch(MCP_SERVER_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: MODEL, message })
+          body: JSON.stringify({ message: text, model: "mistralai/mistral-7b-instruct:free" })
         });
 
+        removeLoading();
+
         if (!response.ok) {
-          addMessage("⚠️ Error: " + response.statusText, "bot");
+          appendMessage("❌ Server error: " + response.statusText, "bot-message");
           return;
         }
 
         const data = await response.json();
-        addMessage(data.response || "⚠️ No response from AI", "bot");
+        const reply = data.response || data.message || "⚠ No response from MCP server.";
+        appendMessage(reply, "bot-message");
       } catch (error) {
-        console.error("Error:", error);
-        addMessage("🚨 Failed to reach MCP server", "bot");
+        removeLoading();
+        appendMessage("🚨 Connection error. Check MCP server.", "bot-message");
+        console.error(error);
       }
     }
 
-    function addMessage(text, sender) {
-      const messagesDiv = document.getElementById("chat-messages");
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${sender}`;
-      messageDiv.textContent = text;
-      messagesDiv.appendChild(messageDiv);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
   </script>
 </body>
 </html>
