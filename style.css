@@ -1,71 +1,79 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #f7f9fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
-.container {
-  width: 400px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  padding: 20px;
+.chat-container {
+    width: 400px;
+    height: 600px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
 }
 
-h1 {
-  text-align: center;
-  color: #333;
+header {
+    background: #4CAF50;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
-#chat-box {
-  height: 300px;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 15px;
-  background: #fafafa;
+.chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .message {
-  margin: 8px 0;
+    max-width: 80%;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
 }
 
 .user {
-  text-align: right;
-  color: #007bff;
+    align-self: flex-end;
+    background: #DCF8C6;
 }
 
 .bot {
-  text-align: left;
-  color: #28a745;
+    align-self: flex-start;
+    background: #F1F0F0;
 }
 
 .input-area {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    border-top: 1px solid #ddd;
 }
 
 input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+    flex: 1;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
 }
 
 button {
-  padding: 10px 15px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
 }
 
 button:hover {
-  background: #0056b3;
+    background: #45a049;
 }
